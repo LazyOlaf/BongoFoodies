@@ -8,7 +8,7 @@ using namespace std;
 
 int main()
 {
-    cout << "\n\n\n\t\t ========== WELCOME TO BongoFoodies ==========" << endl;
+    cout << "\n\n\n\t\t ========== WELCOME TO BongoFoodies!! ==========" << endl;
     login_interface();
 
     return 0;
