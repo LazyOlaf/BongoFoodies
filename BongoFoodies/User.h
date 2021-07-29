@@ -1,9 +1,13 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include<iostream>
-#include<string>
+#pragma once
+//#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <fstream>
+#include <string>
 #include <vector>
-#include<ctime>
+#include <unordered_set>
+#include <ctime>
 using namespace std;
 
 class User
@@ -12,8 +16,8 @@ public:
     User();
     virtual ~User();
     static int ID;
-    void Register();
-    void Login();
+    string Register();
+    string Login();
 
 protected:
 
@@ -21,7 +25,7 @@ private:
     string Name;
     string Email;
     string Password;
-    struct tm * DOR;
+    struct tm* DOR;
 };
 
-void login_interface();
+string login_interface();

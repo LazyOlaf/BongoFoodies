@@ -2,14 +2,13 @@
 //
 
 #include <iostream>
-#include "User.h"
-
+#include "MainMenu.h"
 using namespace std;
 
 int main()
 {
-    cout << "\n\n\n\t\t ========== WELCOME TO BongoFoodies!! ==========" << endl;
-    login_interface();
+    cout << "\n\n\n\t\t ========== WELCOME TO BongoFoodies!! ==========\n\n"<<flush;
+    main_menu();
 
     return 0;
 }

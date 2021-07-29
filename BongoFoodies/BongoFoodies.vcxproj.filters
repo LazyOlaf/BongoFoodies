@@ -21,9 +21,27 @@
     <ClCompile Include="User.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HomeCook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Foodie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="User.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HomeCook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Foodie.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
