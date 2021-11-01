@@ -75,7 +75,6 @@ void byReview(SAConnection& conn)
 	{
 		//SELECT Title FROM Recipes WHERE RecipeID = (SELECT RecipeId FROM Rating_chart WHERE Rating >= input)
 	case 1:
-<<<<<<< HEAD
 		byTitle(conn, " WHERE RecipeID IN (SELECT RecipeId FROM Rating_chart WHERE Rating >= 1.0)");
 		break;
 	case 2:
@@ -89,21 +88,6 @@ void byReview(SAConnection& conn)
 		break;
 	case 5:
 		byTitle(conn, " WHERE RecipeID IN (SELECT RecipeId FROM Rating_chart WHERE Rating = 5.0)");
-=======
-		byTitle(conn, " WHERE RecipeID = (SELECT RecipeId FROM Rating_chart WHERE Rating >= 1.0)");
-		break;
-	case 2:
-		byTitle(conn, " WHERE RecipeID = (SELECT RecipeId FROM Rating_chart WHERE Rating >= 2.0)");
-		break;
-	case 3:
-		byTitle(conn, " WHERE RecipeID = (SELECT RecipeId FROM Rating_chart WHERE Rating >= 3.0)");
-		break;
-	case 4:
-		byTitle(conn, " WHERE RecipeID = (SELECT RecipeId FROM Rating_chart WHERE Rating >= 4.0)");
-		break;
-	case 5:
-		byTitle(conn, " WHERE RecipeID = (SELECT RecipeId FROM Rating_chart WHERE Rating = 5.0)");
->>>>>>> dcd665399ffe2a42bf69a2124c478e77c7d6c5c1
 		break;
 	case 6:
 		break;
@@ -147,11 +131,7 @@ void byArea(SAConnection& conn)
 	else {
 
 		//SELECT Title FROM Recipes WHERE RecipeID = (SELECT RecipeId FROM Delivery_area WHERE Area = 'input')
-<<<<<<< HEAD
 		string str = " WHERE RecipeID IN (SELECT RecipeId FROM Delivery_area WHERE Area = '" + file_list[(unsigned __int64)ch - 1] + "')";
-=======
-		string str = " WHERE RecipeID = (SELECT RecipeId FROM Delivery_area WHERE Area = '" + file_list[(unsigned __int64)ch - 1] + "')";
->>>>>>> dcd665399ffe2a42bf69a2124c478e77c7d6c5c1
 		byTitle(conn, str);
 	}
 }
