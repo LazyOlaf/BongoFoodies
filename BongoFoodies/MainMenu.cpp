@@ -17,7 +17,16 @@ void MainMenu::browse() {
 	browse_interface(conn);
 }
 void MainMenu::tips() {
-	cout << "showing tips\n\n";
+	const int MAX=1000;
+    char buffer[MAX];
+    srand(time(0));
+    int random_num=rand()%30;
+	cout << "\n~~tips & tricks~~\n\n";
+	ifstream read("tnt.txt");
+	while(random_num--)
+        read.getline(buffer,MAX);
+    read.getline(buffer,MAX);
+    cout<<buffer<<endl<<endl;
 }
 void MainMenu::login() {
 

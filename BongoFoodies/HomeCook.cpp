@@ -32,6 +32,7 @@ HomeCook* HomeCook::Register(SAConnection& conn) {
 		insert.setCommandText(_TSA("INSERT INTO Users (UserID, name, email, pass, reg) VALUES (:1, :2, :3, :4, :5)"));
 		insert << (unsigned short)UserID << name.c_str() << email.c_str() << pass.c_str() << SADateTime(1900 + date->tm_year, 1 + date->tm_mon, date->tm_mday);
 		insert.Execute();
+		conn.Commit();
 		cout << "\nRegistration successful!\n" << endl;
 		return Login(conn);
 	}
