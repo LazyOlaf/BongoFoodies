@@ -30,14 +30,13 @@ int main()
 	(
 		RecipeID INT,
 		Title VARCHAR2(20),
-		Cook INT,
+		CookID INT,
 		Region VARCHAR2(20), 
 		Time NUMBER, 
 		Servings INT, 
-		Rating NUMBER,
 		Price NUMBER,
 		CONSTRAINT r_pk PRIMARY KEY (RecipeID),
-		CONSTRAINT r_fk FOREIGN KEY (Cook) references Users (UserID)
+		CONSTRAINT r_fk FOREIGN KEY (CookID) references Users (UserID)
 	);
 */
 /*
@@ -46,5 +45,18 @@ int main()
 		RecipeID INT,
 		Area VARCHAR2(20),
 		CONSTRAINT d_fk FOREIGN KEY (RecipeID) REFERENCES Recipes (RecipeID)
+	);
+*/
+/*
+	CREATE TABLE Rating_chart
+	(
+		RecipeID INT,
+		star5 INT,
+		star4 INT,
+		star3 INT,
+		star2 INT,
+		star1 INT,
+		Rating NUMBER,
+		CONSTRAINT s_fk FOREIGN KEY (RecipeID) REFERENCES Recipes (RecipeID)
 	);
 */
