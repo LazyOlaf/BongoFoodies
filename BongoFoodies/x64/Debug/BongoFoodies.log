@@ -1,0 +1,4 @@
+﻿  MainMenu.cpp
+C:\Users\Tasnim\source\repos\BongoFoodies\BongoFoodies\MainMenu.cpp(26,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Tasnim\source\repos\BongoFoodies\BongoFoodies\MainMenu.cpp(138): warning C4715: 'login_interface': not all control paths return a value
+  BongoFoodies.vcxproj -> C:\Users\Tasnim\source\repos\BongoFoodies\x64\Debug\BongoFoodies.exe

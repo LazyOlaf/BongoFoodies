@@ -3,7 +3,10 @@
 
 #include <iostream>
 #include <fstream>
+<<<<<<< HEAD
 #include <sstream>
+=======
+>>>>>>> dcd665399ffe2a42bf69a2124c478e77c7d6c5c1
 #include <string>
 #include <vector>
 #include <cmath>
@@ -19,9 +22,15 @@ protected:
 	string title;
 	string cook_name;
 	string region;
+<<<<<<< HEAD
 	double time = 0.0;
 	int servings = 0;
 	double rating = 0.0;
+=======
+	double time=0.0;
+	int servings=0;
+	double rating;
+>>>>>>> dcd665399ffe2a42bf69a2124c478e77c7d6c5c1
 	vector<int> star_count;
 	vector<string> delivery_area;
 	vector<string> ingredients;
@@ -32,7 +41,11 @@ public:
 	Recipe();
 	virtual ~Recipe();
 	static int RecipeID;
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> dcd665399ffe2a42bf69a2124c478e77c7d6c5c1
 	void show_recipe_details(SAConnection& conn, string filename);
 	void recipe_options_interface(SAConnection& conn);
 	void download_recipe(SAConnection& conn);
