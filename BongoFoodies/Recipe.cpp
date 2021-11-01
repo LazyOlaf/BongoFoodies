@@ -17,207 +17,169 @@ Recipe::~Recipe()
 void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 {
 	Sleep(100);
-	system("CLS");
-	cout << "****Recipe Info****\n\n";
+    system("CLS");
+    cout << "****Recipe Info****\n\n";
+    RecipeID++;
+    cout << "\n\nTitle: ";
+    cin >> title;
+    ofstream recipe_text(title + cook_name + ".txt");
+    cout << "\nRegion: ";
+    cin >> region;
+    cout << "\nCooking time (in minutes): ";
+    cin >> time;
+    cout << "\nServings: ";
+    cin >> servings;
+    cout << "\n";
+    string ch;
+    string ing="";
+    do
+    {
+        cout << "Ingredient: ";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        string ingre;
+        getline(cin, ingre);
+        ing+=ingre+", ";
+        ingredients.push_back(ingre);
+        cout << "Add more? (y/n)...";
+        cin >> ch;
+    }
+    while (ch == "y" || ch == "Y");
+    for(int i=0; i<ing.size(); i++)
+        recipe_text.put(ing[i]);
+    recipe_text.put('\n');
+    cout << "\n\nDirections: ";
+    cin.ignore(256, '\n');
+    getline(cin, procedure);
+    for(int i=0; i<procedure.size(); i++)
+        recipe_text.put(procedure[i]);
+    recipe_text.put('\n');
+    cout << "\nAvailable for delivery? (y/n)...";
+    cin >> ch;
+    cout << "\n";
+    if (ch == "y" || ch == "Y")
+    {
+        string ar="";
+        do
+        {
+            cout << "Delivery area: ";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            string area;
+            getline(cin, area);
+            ar+=area+", ";
+            delivery_area.push_back(area);
+            cout << "Add more? (y/n)...";
+            cin >> ch;
+        }
+        while (ch == "y" || ch == "Y");
+        for(int i=0; i<ar.size(); i++)
+            recipe_text.put(ar[i]);
+        cout << "\nPrice (in taka): ";
+        cin >> price;
+    }
 
-	RecipeID++;
+    SACommand insert(&conn);
+    try
+    {
+        insert.setCommandText(_TSA("INSERT INTO Recipes (RecipeID, Title, Cook, Region, Time, Servings, Price, Rating) VALUES (:1, :2, :3, :4, :5, :6, :7, :8)"));
+        insert << (unsigned short)RecipeID << title.c_str() << (unsigned short)cook_ID << region.c_str() << (double)time << (unsigned short)servings << (double)price << (double)rating;
+        cout<<RecipeID<<endl;
+        insert.Execute();
+        conn.Commit();
+        for (int i = 0; i < delivery_area.size(); i++)
+        {
+            insert.setCommandText(_TSA("INSERT INTO Delivery_Area (RecipeID, Area) VALUES (:1, :2)"));
+            insert << (unsigned short)RecipeID << delivery_area[i].c_str();
+            insert.Execute();
+            conn.Commit();
+        }
+    }
+    catch (SAException& e)
+    {
+        (void)e;
+        //conn.Rollback();
+        cout << e.ErrText().GetMultiByteChars();
+        cout << "\nProblem uploading!\n";
+    }
 
-	cout << "\n\nTitle: ";
-	cin >> title;
-
-	cout << "\nRegion: ";
-	cin >> region;
-
-	cout << "\nCooking time (in minutes): ";
-	cin >> time;
-
-	cout << "\nServings: ";
-	cin >> servings;
-	cout << "\n";
-
-	string ch;
-	do
-	{
-		cout << "Ingredient: ";
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		string ingre;
-		getline(cin, ingre);
-		ingredients.push_back(ingre);
-		cout << "Add more? (y/n)...";
-		cin >> ch;
-	} while (ch == "y" || ch == "Y");
-
-	cout << "\n\nDirections: ";
-	cin.ignore(256, '\n');
-	getline(cin, procedure);
-
-	cout << "\nAvailable for delivery? (y/n)...";
-	cin >> ch;
-	cout << "\n";
-	if (ch == "y" || ch == "Y") {
-
-		do
-		{
-			cout << "Delivery area: ";
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			string area;
-			getline(cin, area);
-			delivery_area.push_back(area);
-			cout << "Add more? (y/n)...";
-			cin >> ch;
-		} while (ch == "y" || ch == "Y");
-
-		cout << "\nPrice (in taka): ";
-		cin >> price;
-	}
-
-	SACommand insert(&conn);
-	try
-	{
-		insert.setCommandText(_TSA("INSERT INTO Recipes (RecipeID, Title, CookID, Region, Time, Servings, Price) VALUES (:1, :2, :3, :4, :5, :6, :7)"));
-		insert << (unsigned short)RecipeID << title.c_str() << (unsigned short)cook_ID << region.c_str() << (double)time << (unsigned short)servings << (double)price;
-		insert.Execute();
-
-		insert.setCommandText(_TSA("INSERT INTO Rating_chart VALUES (:1, 0, 0, 0, 0, 0, 0.0)"));
-		insert << (unsigned short)RecipeID;
-		insert.Execute();
-		conn.Commit();
-		for (int i = 0; i < delivery_area.size(); i++)
-		{
-			insert.setCommandText(_TSA("INSERT INTO Delivery_Area (RecipeID, Area) VALUES (:1, :2)"));
-			insert << (unsigned short)RecipeID << delivery_area[i].c_str();
-			insert.Execute();
-			conn.Commit();
-		}
-	}
-	catch (SAException& e)
-	{
-		(void)e;
-		//conn.Rollback();
-		cout << e.ErrText().GetMultiByteChars();
-		cout << "\nProblem uploading!\n";
-	}
-
-	ofstream recipe_text;
-	recipe_text.open(title + ".txt", ios::app);
-	recipe_text.write((char*)this, sizeof(this));
-	recipe_text.close();
-
-	cout << "\nNew recipe uploaded!\n" << endl;
+    cout << "\nNew recipe uploaded!\n" << endl;
 }
 
 void Recipe::show_recipe_details(SAConnection& conn, string filename)
 {
 	Sleep(100);
-	system("CLS");
+    system("CLS");
 
-	SACommand select1(&conn), select2(&conn), select3(&conn), select4(&conn);
-	try
-	{
-		select1.setCommandText(_TSA("SELECT * FROM Recipes WHERE Title = :1"));
-		select1 << filename.c_str();
-		select1.Execute();
-		select2.setCommandText(_TSA("SELECT Name FROM Users WHERE UserID = (SELECT CookID FROM Recipes WHERE Title = :1)"));
-		select2 << filename.c_str();
-		select2.Execute();
-		select3.setCommandText(_TSA("SELECT * FROM Rating_chart WHERE RecipeID = (SELECT RecipeID FROM Recipes WHERE Title = :1)"));
-		select3 << filename.c_str();
-		select3.Execute();
-		select4.setCommandText(_TSA("SELECT Area FROM Delivery_area WHERE RecipeID = (SELECT RecipeID FROM Recipes WHERE Title = :1)"));
-		select4 << filename.c_str();
-		select4.Execute();
+    SACommand select1(&conn), select2(&conn), select3(&conn);
+    try
+    {
+        select1.setCommandText(_TSA("SELECT * FROM Recipes WHERE Title = :1"));
+        select1 << filename.c_str();
+        select1.Execute();
+        select2.setCommandText(_TSA("SELECT Area FROM Delivery_area WHERE RecipeID = (SELECT RecipeID FROM Recipes WHERE Title = :1)"));
+        select2 << filename.c_str();
+        select2.Execute();
+        select3.setCommandText(_TSA("SELECT Name FROM Users WHERE UserID = (SELECT Cook FROM Recipes WHERE Title = :1)"));
+        select3 << filename.c_str();
+        select3.Execute();
 
+        while (select1.FetchNext())
+        {
 
-		while (select1.FetchNext())
-		{
-
-			RecipeID = select1.Field(_TSA("RecipeID")).asUShort();
-			title = select1.Field(_TSA("Title")).asString().GetMultiByteChars();
-			region = select1.Field(_TSA("Region")).asString().GetMultiByteChars();
-			time = select1.Field(_TSA("Time")).asDouble();
-			servings = select1.Field(_TSA("Servings")).asUShort();
-			price = select1.Field(_TSA("Price")).asDouble();
+            RecipeID = select1.Field(_TSA("RecipeID")).asUShort();
+            title = select1.Field(_TSA("Title")).asString().GetMultiByteChars();
+            region = select1.Field(_TSA("Region")).asString().GetMultiByteChars();
+            time = select1.Field(_TSA("Time")).asDouble();
+            servings = select1.Field(_TSA("Servings")).asUShort();
+            rating = select1.Field(_TSA("Rating")).asDouble();
+            price = select1.Field(_TSA("Price")).asDouble();
 
 
-			while (select2.FetchNext())
-			{
-				cook_name = select2.Field(_TSA("Name")).asString().GetMultiByteChars();
-			}
-			while (select3.FetchNext())
-			{
-				star_count.push_back(select3.Field(_TSA("star5")).asUShort());
-				star_count.push_back(select3.Field(_TSA("star4")).asUShort());
-				star_count.push_back(select3.Field(_TSA("star3")).asUShort());
-				star_count.push_back(select3.Field(_TSA("star2")).asUShort());
-				star_count.push_back(select3.Field(_TSA("star1")).asUShort());
-				rating = select3.Field(_TSA("Rating")).asDouble();
-			}
-			while (select4.FetchNext())
-			{
-				delivery_area.push_back(select4.Field(_TSA("Area")).asString().GetMultiByteChars());
-			}
+            while (select3.FetchNext())
+            {
+                cook_name = select3.Field(_TSA("Name")).asString().GetMultiByteChars();
+            }
+            while (select2.FetchNext())
+            {
+                delivery_area.push_back(select2.Field(_TSA("Area")).asString().GetMultiByteChars());
+            }
+            Recipe r;
+            cout << "****Recipe Info****\n\n";
+            cout << "\n\nTitle: " << title;
+            cout << "\nCook name: " << cook_name;
+            cout << "\nRegion: " << region;
+            cout << "\nCooking time (in minutes): " << time;
+            cout << "\nServings: " << servings;
 
-			/*ifstream recipe_text;
-			Recipe r;
-			recipe_text.open(title + ".txt", ios::in);
-			recipe_text.seekg(0);
-			recipe_text.read((char*)&r, sizeof(r));
-			recipe_text.close();
+            cout << "\nIngredients: ";
+            const int MAX=1000;
+            char buffer[MAX];
+            ifstream read(title+".txt");
+            read.getline(buffer,MAX);
+            cout<<buffer<<endl;
+            cout << "\nDirections: " << procedure;
+            read.getline(buffer,MAX);
+            cout<<buffer<<endl;
+            if (delivery_area.empty())
+                cout << "\nDelivery service not available!";
+            else
+            {
+                cout << "\nDelivery areas: ";
+                read.getline(buffer,MAX);
+                cout<<buffer<<endl;
+            }
 
-			cout << "printing   ";
-			for (auto it = r.ingredients.begin(); it != r.ingredients.end(); it++)
-				cout << *it;
-			cout << r.procedure;
-			cout << "     printing   ";
-			ingredients = r.ingredients;
-			procedure = r.procedure;*/
-
-
-			cout << "****Recipe Info****\n\n";
-			cout << "\n\nTitle: " << title;
-			cout << "\nCook name: " << cook_name;
-			cout << "\nRegion: " << region;
-			cout << "\nCooking time (in minutes): " << time;
-			cout << "\nServings: " << servings;
-
-			cout << "\nIngredients: ";
-			int s = ingredients.size();
-			for (auto it = ingredients.begin(); it != ingredients.end(); it++) {
-				if (s > 1)
-					cout << *it << ", ";
-				else
-					cout << *it;
-				s--;
-			}
-
-			cout << "\nDirections: " << procedure;
-			cout << "\nRating: " << rating;
-
-			if (delivery_area.empty())
-				cout << "\nDelivery service not available!";
-			else {
-				cout << "\nDelivery areas: ";
-				int s = delivery_area.size();
-				for (auto it = delivery_area.begin(); it != delivery_area.end(); it++) {
-					if (s > 1)
-						cout << *it << ", ";
-					else
-						cout << *it;
-					s--;
-				}
-			}
-
-			cout << "\nPrice (in taka): " << price << endl;
-			cout << "\n\n";
-		}
-	}
-	catch (SAException& e)
-	{
-		(void)e;
-		//conn.Rollback();
-		cout << e.ErrText().GetMultiByteChars();
-		cout << "\nProblem uploading!\n";
-	}
+            cout << "\nPrice (in taka): " << price << endl;
+            cout << "\n\n";
+        }
+    }
+    catch (SAException& e)
+    {
+        (void)e;
+        //conn.Rollback();
+        cout << e.ErrText().GetMultiByteChars();
+        cout << "\nProblem uploading!\n";
+    }
+    system("pause");
 
 	this->recipe_options_interface(conn);
 
