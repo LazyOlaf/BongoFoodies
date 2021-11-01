@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include "Search.h"
 #include "Foodie.h"
 #include "HomeCook.h"
 using namespace std;
@@ -15,8 +16,6 @@ public:
 	void login();
 };
 
-//extern bool logged_in;
 User* login_interface(SAConnection& conn);
 void main_menu();
-//extern User* user_ptr;
 

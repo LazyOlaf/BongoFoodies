@@ -14,8 +14,7 @@ void MainMenu::highlights() {
 	cout << "showing highlights\n\n";
 }
 void MainMenu::browse() {
-	cout << "redirecting to browse page\n\n";
-	cout << "1.byTitle()\n <<2.byRegion()\n 3.byReview()\n 4.byPrice()\n 3.byArea()\n";
+	browse_interface(conn);
 }
 void MainMenu::tips() {
 	cout << "showing tips\n\n";
@@ -39,7 +38,6 @@ void MainMenu::login() {
 void main_menu()
 {
 	conn.Connect(_TSA("localhost:1521/xepdb1"), _TSA("BFadmin"), _TSA("foodislove"), SA_Oracle_Client); //cout << "We are connected!\n";
-	
 
 	MainMenu menu;
 
@@ -72,13 +70,11 @@ void main_menu()
 		case 4:
 			menu.login();
 			break;
-		case 5:
+		case 5: {
 			cout << "Come again :')\n\n";
-			break;
-		}
-		if (choice == 5) {
 			conn.Disconnect();	//cout << "We are disconnected!\n";
-			break;
+		}
+			  return;
 		}
 	}
 }

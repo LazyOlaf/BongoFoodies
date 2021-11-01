@@ -13,6 +13,7 @@ int main()
 
 
 //bfadmin/foodislove@localhost/xepdb1
+//DELETE FROM table_name;
 /*
 	CREATE TABLE Users 
 	(

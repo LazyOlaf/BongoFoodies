@@ -124,9 +124,13 @@ void HomeCook::profile(SAConnection& conn)
 	case 2:
 		this->edit_recipe();
 		break;
-	case 3:
-		this->show_recipes();
-		break;
+	case 3: {
+		Recipe r;
+		string t;
+		cout<<"Enter recipe name : ";
+		cin >> t;
+		r.show_recipe_details(conn, t);
+		break; }
 	case 4:
 		this->orders_to_be_fulfilled();
 		break;
