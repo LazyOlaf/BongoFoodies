@@ -19,9 +19,9 @@ protected:
 	string title;
 	string cook_name;
 	string region;
-	double time=0.0;
-	int servings=0;
-	double rating;
+	double time = 0.0;
+	int servings = 0;
+	double rating = 0.0;
 	vector<int> star_count;
 	vector<string> delivery_area;
 	vector<string> ingredients;
@@ -32,7 +32,7 @@ public:
 	Recipe();
 	virtual ~Recipe();
 	static int RecipeID;
-	
+
 	void show_recipe_details(SAConnection& conn, string filename);
 	void recipe_options_interface(SAConnection& conn);
 	void download_recipe(SAConnection& conn);
