@@ -12,22 +12,34 @@ MainMenu::~MainMenu() {
 
 void MainMenu::highlights() {
 	cout << "showing highlights\n\n";
+	byTitle(conn, " WHERE RecipeID IN (SELECT RecipeID FROM (SELECT * FROM Rating_chart ORDER BY Rating DESC) WHERE ROWNUM <= 5)");
+
 }
 void MainMenu::browse() {
 	browse_interface(conn);
 }
 void MainMenu::tips() {
-	const int MAX=1000;
-    char buffer[MAX];
-    srand(time(0));
-    int random_num=rand()%30;
-	cout << "\n~~tips & tricks~~\n\n";
-	ifstream read("tnt.txt");
-	while(random_num--)
-        read.getline(buffer,MAX);
-    read.getline(buffer,MAX);
-    cout<<buffer<<endl<<endl;
+	cout << "\n**Tips & Tricks**\n\n";
+	const int MAX = 1000;
+	char buffer[MAX];
+	while (1) {
+		srand(time(0));
+		int random_num = rand() % 30;
+		ifstream read("tnt.txt");
+		while (random_num--)
+			read.getline(buffer, MAX);
+		read.getline(buffer, MAX);
+		cout << buffer << endl;
+
+		cout << "\n\nOne more? (y/n)...";
+		string t;
+		cin >> t;
+		if (t == "N" || t == "n")
+			break;
+		cout << "\n\n";
+	}
 }
+
 void MainMenu::login() {
 
 	if (logged_in == 0) {
