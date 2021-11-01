@@ -77,7 +77,7 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 		insert.setCommandText(_TSA("INSERT INTO Recipes (RecipeID, Title, Cook, Region, Time, Servings, Price, Rating) VALUES (:1, :2, :3, :4, :5, :6, :7, :8)"));
 		insert << (unsigned short)RecipeID << title.c_str() << (unsigned short)cook_ID << region.c_str() << (double)time << (unsigned short)servings << (double)price << (double)rating;
 		insert.Execute();
-
+		conn.Commit();
 		for (int i = 0; i < delivery_area.size(); i++)
 		{
 			insert.setCommandText(_TSA("INSERT INTO Delivery_Area (RecipeID, Area) VALUES (:1, :2)"));
