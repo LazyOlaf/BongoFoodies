@@ -83,6 +83,7 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 			insert.setCommandText(_TSA("INSERT INTO Delivery_Area (RecipeID, Area) VALUES (:1, :2)"));
 			insert << (unsigned short)RecipeID << delivery_area[i].c_str();
 			insert.Execute();
+			conn.Commit();
 		}
 	}
 	catch (SAException& e)
