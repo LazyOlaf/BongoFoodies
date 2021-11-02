@@ -10,6 +10,7 @@
 #include <windows.h>
 #include <ShlObj.h>
 #include <SQLAPI.h>
+#include<limits>
 
 using namespace std;
 
