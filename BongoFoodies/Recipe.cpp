@@ -86,7 +86,8 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 		insert.setCommandText(_TSA("INSERT INTO Recipes (RecipeID, Title, CookID, Region, Time, Servings, Price) VALUES (:1, :2, :3, :4, :5, :6, :7)"));
 		insert << (unsigned short)RecipeID << title.c_str() << (unsigned short)cook_ID << region.c_str() << (double)time << (unsigned short)servings << (double)price;
 		insert.Execute();
-
+		conn.Commit();
+		
 		insert.setCommandText(_TSA("INSERT INTO Rating_chart VALUES (:1, 0, 0, 0, 0, 0, 0.0)"));
 		insert << (unsigned short)RecipeID;
 		insert.Execute();
