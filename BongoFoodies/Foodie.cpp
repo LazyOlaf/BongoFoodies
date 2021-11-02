@@ -40,7 +40,13 @@ Foodie* Foodie::Register(SAConnection& conn) {
 	system("CLS");
 	cout << "\n\t **** Registration ****\n\n";
 
-
+	SACommand Count(&conn);
+	Count.setCommandText(_TSA("SELECT UserID FROM Users"));
+	Count.Execute();
+	while(Count.FetchNext())
+	{
+		UserID = Count.Field(_TSA("UserID")).asUShort();
+	}
 	UserID++; 
 	time_t now = time(0);
 	struct tm* date = localtime(&now);
