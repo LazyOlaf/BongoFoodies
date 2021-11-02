@@ -19,7 +19,14 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 	Sleep(100);
 	system("CLS");
 	cout << "****Recipe Info****\n\n";
-
+	
+	SACommand Count(&conn);
+	Count.setCommandText(_TSA("SELECT RecipeID FROM Recipes"));
+	Count.Execute();
+	while(Count.FetchNext())
+	{
+		RecipeID = Count.Field(_TSA("RecipeID")).asUShort();
+	}
 	RecipeID++;
 
 	cout << "\n\nTitle: ";
