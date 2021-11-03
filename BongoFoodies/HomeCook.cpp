@@ -1,6 +1,6 @@
 #include "HomeCook.h"
 
-extern bool logged_in;
+extern bool cook_toggle;
 
 HomeCook::HomeCook() {
 	//cout << "hcctor\n";
@@ -13,14 +13,8 @@ HomeCook::~HomeCook() {
 HomeCook* HomeCook::Register(SAConnection& conn) {
 	system("CLS");
 	cout << "\n\t **** Registration ****\n\n";
-	SACommand Count(&conn);
-	Count.setCommandText(_TSA("SELECT UserID FROM Users"));
-	Count.Execute();
-	while(Count.FetchNext())
-	{
-		UserID = Count.Field(_TSA("UserID")).asUShort();
-	}
-	UserID++; 
+
+	UserID++;
 	time_t now = time(0);
 	struct tm* date = localtime(&now);
 	string name, email, pass;
@@ -95,6 +89,7 @@ HomeCook* HomeCook::Login(SAConnection& conn)
 			Email = email;
 			Password = pass;
 			cout << "\nLogin successful!\n" << endl;
+			cook_toggle = 1;
 			return this;
 		}
 	}
@@ -108,40 +103,47 @@ void HomeCook::profile(SAConnection& conn)
 	cout << "User ID: " << UserID << endl;
 	cout << "Name: " << Name << endl;
 	cout << "Email: " << Email << endl;
-	cout << "Member since: " << DOR.tm_mday << "-" << DOR.tm_mon << "-" << DOR.tm_year << endl << "\n\n";
+	cout << "Member since: " << DOR.tm_mday << "-" << DOR.tm_mon << "-" << DOR.tm_year + 1900 << endl << "\n\n";
 
 
 	cout << "1. Upload a new recipe\n";
-	cout << "2. Edit an existing recipe\n";
-	cout << "3. View all recipes\n";
-	cout << "4. View pending orders\n";
-	cout << "5. Logout\n";
-	cout << "6. Return to Main Menu\n\n";
+	cout << "2. View all recipes\n";
+	cout << "3. View pending orders\n";
+	cout << "4. Logout\n";
+	cout << "5. Return to Main Menu\n\n";
 	cout << "\nEnter choice: ";
 	int choice;
 	cin >> choice;
 	switch (choice)
 	{
-	case 1: {
+	case 1:
+	{
 		Recipe r;
 		r.upload_recipe(conn, UserID);
 	}
-		  break;
+	break;
 	case 2:
-		this->edit_recipe();
-		break;
+	{
+		system("CLS");
+		string query;
+		query = "SELECT Title FROM Recipes WHERE CookID = ";
+		query += UserID + '0';
+		vector<string> file_list = show_recipe_list(conn, query, "Title");
+		cout << "\nEnter choice: ";
+		int ch;
+		cin >> ch;
+		if (ch != 0) {
+			Recipe r;
+			r.show_recipe_details(conn, file_list[(unsigned __int64)ch - 1]);
+		}
+	}
+	break;
 	case 3: {
-		Recipe r;
-		string t;
-		cout<<"Enter recipe name : ";
-		cin >> t;
-		r.show_recipe_details(conn, t);
-		break; }
+		//this->orders_to_be_fulfilled();
+	}
+		  break;
 	case 4:
-		this->orders_to_be_fulfilled();
-		break;
-	case 5:
-		logged_in = 0;
+		cook_toggle = 0;
 		cout << "Logging Out\n\n";
 		break;
 	default:
@@ -149,16 +151,6 @@ void HomeCook::profile(SAConnection& conn)
 	}
 }
 
-
-void HomeCook::edit_recipe() {
-}
-
-void HomeCook::show_recipes() {
-}
-
-
-void HomeCook::orders_to_be_fulfilled() {
-}
 
 
 

@@ -10,14 +10,16 @@
 #include <windows.h>
 #include <ShlObj.h>
 #include <SQLAPI.h>
-#include<limits>
-
+#include <limits>
+#include "User.h"
+#include "Order.h"
 using namespace std;
 
 class Recipe
 {
 protected:
 	string title;
+	int cook_ID;
 	string cook_name;
 	string region;
 	double time = 0.0;
@@ -36,15 +38,19 @@ public:
 
 	void show_recipe_details(SAConnection& conn, string filename);
 	void recipe_options_interface(SAConnection& conn);
+	void recipe_options_interface(SAConnection& conn, int foodie_ID);
 	void download_recipe(SAConnection& conn);
 	void give_feedback(SAConnection& conn);
 	void show_cook_profile(SAConnection& conn);
 	void order_recipe(SAConnection& conn);
+	//Recipe& operator=(const Recipe& r);
+	double getPrice();
+	string getRecipeTitle();
 
 	void upload_recipe(SAConnection& conn, int cook_ID);
-	//void edit_recipe(SAConnection& conn, int cook_ID);
+	void edit_recipe(SAConnection& conn);
 
 	friend class HomeCook;
 };
 
-vector<string> show_recipe(SAConnection& conn, string query, string field);
+vector<string> show_recipe_list(SAConnection& conn, string query, string field);

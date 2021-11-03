@@ -1,8 +1,7 @@
 #include "Recipe.h"
-
+extern bool cook_toggle;
+extern bool foodie_toggle;
 int Recipe::RecipeID = 0;
-
-//vector<string> file_list;
 
 Recipe::Recipe()
 {
@@ -14,19 +13,13 @@ Recipe::~Recipe()
 	//dtor
 }
 
+
 void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 {
 	Sleep(100);
 	system("CLS");
 	cout << "****Recipe Info****\n\n";
-	
-	SACommand Count(&conn);
-	Count.setCommandText(_TSA("SELECT RecipeID FROM Recipes"));
-	Count.Execute();
-	while(Count.FetchNext())
-	{
-		RecipeID = Count.Field(_TSA("RecipeID")).asUShort();
-	}
+
 	RecipeID++;
 
 	cout << "\n\nTitle: ";
@@ -38,11 +31,10 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 	cout << "\nCooking time (in minutes): ";
 	cin >> time;
 
-	cout << "\nServings: ";
+	cout << "\nNo. of Servings: ";
 	cin >> servings;
 	cout << "\n";
 
-	string ing = "";
 	string ch;
 	do
 	{
@@ -50,7 +42,6 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		string ingre;
 		getline(cin, ingre);
-		ing += ingre + ", ";
 		ingredients.push_back(ingre);
 		cout << "Add more? (y/n)...";
 		cin >> ch;
@@ -86,19 +77,19 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 		insert.setCommandText(_TSA("INSERT INTO Recipes (RecipeID, Title, CookID, Region, Time, Servings, Price) VALUES (:1, :2, :3, :4, :5, :6, :7)"));
 		insert << (unsigned short)RecipeID << title.c_str() << (unsigned short)cook_ID << region.c_str() << (double)time << (unsigned short)servings << (double)price;
 		insert.Execute();
-		conn.Commit();
-		
+
 		insert.setCommandText(_TSA("INSERT INTO Rating_chart VALUES (:1, 0, 0, 0, 0, 0, 0.0)"));
 		insert << (unsigned short)RecipeID;
 		insert.Execute();
-		conn.Commit();
+
 		for (int i = 0; i < delivery_area.size(); i++)
 		{
 			insert.setCommandText(_TSA("INSERT INTO Delivery_Area (RecipeID, Area) VALUES (:1, :2)"));
 			insert << (unsigned short)RecipeID << delivery_area[i].c_str();
 			insert.Execute();
-			conn.Commit();
 		}
+
+		conn.Commit();
 	}
 	catch (SAException& e)
 	{
@@ -114,8 +105,8 @@ void Recipe::upload_recipe(SAConnection& conn, int cook_ID)
 		recipe_text << *it << " ";
 	recipe_text << "\n";
 
-	for (auto it = procedure.begin(); it != procedure.end(); it++)
-		recipe_text << *it;
+	//for (auto it = procedure.begin(); it != procedure.end(); it++)
+	recipe_text << procedure;
 	recipe_text << "\n";
 
 	recipe_text.close();
@@ -136,7 +127,7 @@ void Recipe::show_recipe_details(SAConnection& conn, string filename)
 		select1.setCommandText(_TSA("SELECT * FROM Recipes WHERE Title = :1"));
 		select1 << filename.c_str();
 		select1.Execute();
-		select2.setCommandText(_TSA("SELECT Name FROM Users WHERE UserID = (SELECT CookID FROM Recipes WHERE Title = :1)"));
+		select2.setCommandText(_TSA("SELECT UserID, Name FROM Users WHERE UserID = (SELECT CookID FROM Recipes WHERE Title = :1)"));
 		select2 << filename.c_str();
 		select2.Execute();
 		select3.setCommandText(_TSA("SELECT * FROM Rating_chart WHERE RecipeID = (SELECT RecipeID FROM Recipes WHERE Title = :1)"));
@@ -160,6 +151,7 @@ void Recipe::show_recipe_details(SAConnection& conn, string filename)
 
 			while (select2.FetchNext())
 			{
+				cook_ID = select2.Field(_TSA("UserID")).asUShort();
 				cook_name = select2.Field(_TSA("Name")).asString().GetMultiByteChars();
 			}
 			while (select3.FetchNext())
@@ -197,7 +189,7 @@ void Recipe::show_recipe_details(SAConnection& conn, string filename)
 			cout << "\nCook name: " << cook_name;
 			cout << "\nRegion: " << region;
 			cout << "\nCooking time (in minutes): " << time;
-			cout << "\nServings: " << servings;
+			cout << "\nNo. of Servings: " << servings;
 
 			cout << "\nIngredients: ";
 			int s = ingredients.size();
@@ -235,15 +227,40 @@ void Recipe::show_recipe_details(SAConnection& conn, string filename)
 		(void)e;
 		//conn.Rollback();
 		cout << e.ErrText().GetMultiByteChars();
-		cout << "\nProblem uploading!\n";
+		cout << "\nProblem viewing!\n";
 	}
 
-	this->recipe_options_interface(conn);
+	if (cook_toggle == 1)
+		this->recipe_options_interface(conn);
+	else if (foodie_toggle == 1)
+		this->recipe_options_interface(conn, User::UserID);
 
+	system("pause");
 }
 
 
+
 void Recipe::recipe_options_interface(SAConnection& conn)
+{
+	cout << "\n\n\n";
+	cout << "1.Edit recipe\n" << "2.Download recipe\n" << "3.Back\n";
+	cout << "\nEnter choice: ";
+	int choice;
+	cin >> choice;
+	switch (choice)
+	{
+	case 1:
+		this->edit_recipe(conn);
+		break;
+	case 2:
+		this->download_recipe(conn);
+		break;
+	case 3:
+		break;
+	}
+}
+
+void Recipe::recipe_options_interface(SAConnection& conn, int foodie_ID)
 {
 	cout << "\n\n\n";
 	cout << "1.Give feedback\n" << "2.Download recipe\n" << "3.Order recipe\n" << "4.Visit cook profile\n" << "5.Back\n";
@@ -258,9 +275,9 @@ void Recipe::recipe_options_interface(SAConnection& conn)
 	case 2:
 		this->download_recipe(conn);
 		break;
-	case 3:
+	case 3: {
 		this->order_recipe(conn);
-		break;
+		break; }
 	case 4:
 		this->show_cook_profile(conn);
 		break;
@@ -269,15 +286,225 @@ void Recipe::recipe_options_interface(SAConnection& conn)
 	}
 }
 
+void Recipe::order_recipe(SAConnection& conn)
+{
+	/*if (logged_in == 0)
+	{
+		MainMenu m;
+		m.login();
+	}*/
+	Order order;
+	order.order_details(conn, RecipeID, getPrice(), getRecipeTitle());
+}
+
+double Recipe::getPrice()
+{
+	return price;
+}
+
+string Recipe::getRecipeTitle()
+{
+	return title;
+}
+
+void Recipe::edit_recipe(SAConnection& conn)
+{
+	SACommand update(&conn);
+	ofstream recipe_text;
+	cout << "\n\nWhat do you want to edit?\n";
+	try
+	{
+		while (1) {
+			cout << "\n1.Title  2.Region  3.Cooking time  4.Servings  5.Ingredients  6.Procedure  7.Delivery area  8.Price\n";
+			cout << "\nEnter choice: ";
+			int choice;
+			cin >> choice;
+			if (choice == 1) {
+				cout << "Enter new title: ";
+				cin >> title;
+				update.setCommandText(_TSA("UPDATE Recipes SET Title = :1 WHERE RecipeID = :2"));
+				update << title.c_str() << (unsigned short)RecipeID;
+				update.Execute();
+			}
+			else if (choice == 2) {
+				cout << "Enter new region: ";
+				cin >> region;
+				update.setCommandText(_TSA("UPDATE Recipes SET Region= :1 WHERE RecipeID = :2"));
+				update << region.c_str() << (unsigned short)RecipeID;
+				update.Execute();
+			}
+			else if (choice == 3) {
+				cout << "Enter new cooking time (in minutes): ";
+				cin >> time;
+				update.setCommandText(_TSA("UPDATE Recipes SET Time = :1 WHERE RecipeID = :2"));
+				update << (double)time << (unsigned short)RecipeID;
+				update.Execute();
+			}
+			else if (choice == 4) {
+				cout << "Enter new no. of servings: ";
+				cin >> servings;
+				update.setCommandText(_TSA("UPDATE Recipes SET Servings = :1 WHERE RecipeID = :2"));
+				update << (unsigned short)servings << (unsigned short)RecipeID;
+				update.Execute();
+			}
+			else if (choice == 5) {
+				string ch;
+				ingredients.clear();
+				do
+				{
+					cout << "Enter new ingredients: ";
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					string ingre;
+					getline(cin, ingre);
+					ingredients.push_back(ingre);
+					cout << "Add more? (y/n)...";
+					cin >> ch;
+				} while (ch == "y" || ch == "Y");
+
+				recipe_text.open(title + ".txt", ios::trunc);
+				for (auto it = ingredients.begin(); it != ingredients.end(); it++)
+					recipe_text << *it << " ";
+				recipe_text << "\n";
+				recipe_text << procedure;
+				recipe_text << "\n";
+				recipe_text.close();
+			}
+			else if (choice == 6) {
+				procedure.clear();
+				cout << "Enter new procedure: ";
+				cin.ignore(256, '\n');
+				getline(cin, procedure);
+				recipe_text.open(title + ".txt", ios::trunc);
+				for (auto it = ingredients.begin(); it != ingredients.end(); it++)
+					recipe_text << *it << " ";
+				recipe_text << "\n";
+				recipe_text << procedure;
+				recipe_text << "\n";
+				recipe_text.close();
+			}
+			else if (choice == 7) {
+				string ch;
+				delivery_area.clear();
+				do
+				{
+					cout << "Delivery area: ";
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					string area;
+					getline(cin, area);
+					delivery_area.push_back(area);
+					cout << "Add more? (y/n)...";
+					cin >> ch;
+				} while (ch == "y" || ch == "Y");
+
+				for (int i = 0; i < delivery_area.size(); i++)
+				{
+					update.setCommandText(_TSA("UPDATE Delivery_Area SET Area = :1  WHERE RecipeID = :2"));
+					update << delivery_area[i].c_str() << (unsigned short)RecipeID;
+					update.Execute();
+				}
+			}
+			else if (choice == 8) {
+				if (delivery_area.empty())
+					cout << "\nNo delivery areas found!";
+				else {
+					cout << "Enter new price ";
+					cin >> price;
+					update.setCommandText(_TSA("UPDATE Recipes SET Price = :1 WHERE RecipeID = :2"));
+					update << (double)price << (unsigned short)RecipeID;
+					update.Execute();
+				}
+			}
+
+			cout << "\nEdit more?? (y/n)...";
+			char t;
+			cin >> t;
+			if (t == 'N' || t == 'n')
+				break;
+
+		}
+
+		conn.Commit();
+	}
+	catch (SAException& e)
+	{
+		(void)e;
+		//conn.Rollback();
+		cout << e.ErrText().GetMultiByteChars();
+		cout << "\nProblem editing!\n";
+	}
+
+	cout << "\nRecipe edited successfully!\n" << endl;
+	system("pause");
+}
+
+
+void Recipe::give_feedback(SAConnection& conn)
+{
+	cout << "\n\n\nWanna show this recipe some love?";
+	cout << "\n\n1. *\n" << "2. **\n" << "3. ***\n" << "4. ****\n" << "5. *****\n";
+	cout << "\nEnter choice: ";
+	int ch;
+	cin >> ch;
+	switch (ch)
+	{
+	case 1:
+		star_count[4]++;
+		break;
+	case 2:
+		star_count[3]++;
+		break;
+	case 3:
+		star_count[2]++;
+		break;
+	case 4:
+		star_count[1]++;
+		break;
+	case 5:
+		star_count[0]++;
+		break;
+	}
+
+	rating = star_count[0] * 5 + star_count[1] * 4 + star_count[2] * 3 + star_count[3] * 2 + star_count[4] * 1;
+	rating /= star_count[0] + star_count[1] + star_count[2] + star_count[3] + star_count[4];
+	rating = std::round(rating * 100.0) / 100.0;
+
+
+	SACommand update(&conn);
+	try
+	{
+		update.setCommandText(_TSA("UPDATE Rating_chart SET star5 = :1, star4 = :2, star3 = :3, star2 = :4, star1 = :5, Rating = :6 WHERE RecipeID = :7"));
+		update << (unsigned short)star_count[0] << (unsigned short)star_count[1] << (unsigned short)star_count[2] << (unsigned short)star_count[3] << (unsigned short)star_count[4] << (double)rating << (unsigned short)RecipeID;
+		update.Execute();
+		conn.Commit();
+	}
+	catch (SAException& e)
+	{
+		(void)e;
+		//conn.Rollback();
+		cout << e.ErrText().GetMultiByteChars();
+		cout << "\nProblem uploading!\n";
+	}
+	system("pause");
+}
+
 void Recipe::download_recipe(SAConnection& conn)
 {
+	//vs
+
 	wchar_t* wc = NULL;
 	SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &wc);
 	wstring ws(wc);
 	CoTaskMemFree(static_cast<void*>(wc));
 	string dir(ws.begin(), ws.end());
-
 	string path = dir + "\\" + title + ".txt";
+
+	//codeblocks
+	/*
+	string path;
+	path = getenv("USERPROFILE");
+	path = path + "\\Downloads\\" + title + ".txt";
+	*/
+
 	ofstream recipe_text;
 	recipe_text.open(path, ios::trunc);
 
@@ -322,65 +549,29 @@ void Recipe::download_recipe(SAConnection& conn)
 	system("pause");
 }
 
-void Recipe::give_feedback(SAConnection& conn)
+void Recipe::show_cook_profile(SAConnection& conn)
 {
-	cout << "\n\n\nWanna show this recipe some love?";
-	cout << "\n\n1. *\n" << "2. **\n" << "3. ***\n" << "4. ****\n" << "5. *****\n";
+	cout << "Name: " << cook_name << endl;
+	system("CLS");
+	cout << "Cook name: " << cook_name;
+	cout << "\n\n\nOther recipes from same cook: \n";
+	//SELECT Title FROM Recipes WHERE CookID = this->USERID
+	string query = "SELECT Title FROM Recipes WHERE CookID = ";
+	query += cook_ID + '0';
+	vector<string> file_list = show_recipe_list(conn, query, "Title");
 	cout << "\nEnter choice: ";
 	int ch;
 	cin >> ch;
-	switch (ch)
-	{
-	case 1:
-		star_count[4]++;
-		break;
-	case 2:
-		star_count[3]++;
-		break;
-	case 3:
-		star_count[2]++;
-		break;
-	case 4:
-		star_count[1]++;
-		break;
-	case 5:
-		star_count[0]++;
-		break;
+	if (ch != 0) {
+		Recipe r;
+		r.show_recipe_details(conn, file_list[(unsigned __int64)ch - 1]);
 	}
-
-	rating = star_count[0] * 5 + star_count[1] * 4 + star_count[2] * 3 + star_count[3] * 2 + star_count[4] * 1;
-	rating /= star_count[0] + star_count[1] + star_count[2] + star_count[3] + star_count[4];
-	rating = std::round(rating * 100.0) / 100.0;
-
-
-	SACommand update(&conn);
-	try
-	{
-		update.setCommandText(_TSA("UPDATE Rating_chart SET star5 = :1, star4 = :2, star3 = :3, star2 = :4, star1 = :5, Rating = :6 WHERE RecipeID = :7"));
-		update << (unsigned short)star_count[0] << (unsigned short)star_count[1] << (unsigned short)star_count[2] << (unsigned short)star_count[3] << (unsigned short)star_count[4] << (double)rating << (unsigned short)RecipeID;
-		update.Execute();
-	}
-	catch (SAException& e)
-	{
-		(void)e;
-		//conn.Rollback();
-		cout << e.ErrText().GetMultiByteChars();
-		cout << "\nProblem uploading!\n";
-	}
-	system("pause");
 }
 
-void Recipe::show_cook_profile(SAConnection& conn)
-{
-}
 
-void Recipe::order_recipe(SAConnection& conn)
-{
-}
 
-vector<string> show_recipe(SAConnection& conn, string query, string field)
+vector<string> show_recipe_list(SAConnection& conn, string query, string field)
 {
-	system("CLS");
 	cout << "\n\n";
 	vector<string> file_list;
 

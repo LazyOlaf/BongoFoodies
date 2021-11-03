@@ -20,8 +20,8 @@ int main()
 		UserID INT,
 		Name VARCHAR2(20),
 		Email VARCHAR2(20) UNIQUE,
-		Pass VARCHAR2(20),
-		Reg DATE,
+		Password VARCHAR2(20),
+		DOR DATE,
 		CONSTRAINT u_pk PRIMARY KEY(UserID)
 	);
 */
@@ -36,7 +36,7 @@ int main()
 		Servings INT, 
 		Price NUMBER,
 		CONSTRAINT r_pk PRIMARY KEY (RecipeID),
-		CONSTRAINT r_fk FOREIGN KEY (CookID) references Users (UserID)
+		CONSTRAINT r_u_fk FOREIGN KEY (CookID) references Users (UserID)
 	);
 */
 /*
@@ -44,7 +44,7 @@ int main()
 	(
 		RecipeID INT,
 		Area VARCHAR2(20),
-		CONSTRAINT d_fk FOREIGN KEY (RecipeID) REFERENCES Recipes (RecipeID)
+		CONSTRAINT d_r_fk FOREIGN KEY (RecipeID) REFERENCES Recipes (RecipeID)
 	);
 */
 /*
@@ -57,6 +57,22 @@ int main()
 		star2 INT,
 		star1 INT,
 		Rating NUMBER,
-		CONSTRAINT s_fk FOREIGN KEY (RecipeID) REFERENCES Recipes (RecipeID)
+		CONSTRAINT s_pk PRIMARY KEY (RecipeID),
+		CONSTRAINT s_r_fk FOREIGN KEY (RecipeID) REFERENCES Recipes (RecipeID)
+	);
+*/
+/*
+	CREATE TABLE Orders
+	(
+		OrderID INT,
+		CustomerID INT,
+		RecipeID INT,
+		DOO DATE,
+		Quantity INT,
+		Amount NUMBER,
+		is_Pending NUMBER(1),
+		CONSTRAINT o_pk PRIMARY KEY (OrderID),
+		CONSTRAINT o_u_fk FOREIGN KEY (CustomerID) references Users (UserID),
+		CONSTRAINT o_r_fk FOREIGN KEY (RecipeID) references Recipes (RecipeID)
 	);
 */

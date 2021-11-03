@@ -1,10 +1,13 @@
 #include "MainMenu.h"
-bool logged_in = 0;
+
+bool cook_toggle = 0;
+bool foodie_toggle = 0;
 SAConnection conn;
 
 User* user_ptr;
 MainMenu::MainMenu() {
-	logged_in = 0;
+	cook_toggle = 0;
+	foodie_toggle = 0;
 }
 MainMenu::~MainMenu() {
 	//dtor
@@ -46,9 +49,8 @@ void MainMenu::tips() {
 
 void MainMenu::login() {
 
-	if (logged_in == 0) {
+	if (cook_toggle == 0 && foodie_toggle == 0) {
 		user_ptr = login_interface(conn);
-		logged_in = 1;
 	}
 	else {
 		cout << "redirecting to profile page\n\n";
@@ -64,6 +66,24 @@ void main_menu()
 {
 	conn.Connect(_TSA("localhost:1521/xepdb1"), _TSA("BFadmin"), _TSA("foodislove"), SA_Oracle_Client); //cout << "We are connected!\n";
 
+	SACommand count(&conn);
+	count.setCommandText(_TSA("SELECT UserID FROM Users"));
+	count.Execute();
+	while (count.FetchNext()) {
+		User::UserID = count.Field(_TSA("UserID")).asUShort();
+	}
+	count.setCommandText(_TSA("SELECT RecipeID FROM Recipes"));
+	count.Execute();
+	while (count.FetchNext()) {
+		Recipe::RecipeID = count.Field(_TSA("RecipeID")).asUShort();
+	}
+	/*count.setCommandText(_TSA("SELECT OrderID FROM Orders"));
+	count.Execute();
+	while (count.FetchNext()) {
+		Order::OrderID = count.Field(_TSA("OrderID")).asUShort();
+	}*/
+
+
 	MainMenu menu;
 
 	while (1) {
@@ -72,7 +92,7 @@ void main_menu()
 		cout << "\n\n\n\t\t\t\t\t ========== BongoFoodies ==========\n\n";
 
 		cout << "1.Highlights\t\t2.Browse\t\t3.Tips & Tricks\t\t";
-		if (logged_in == 0)
+		if (cook_toggle == 0 && foodie_toggle == 0)
 			cout << "4.Register/Login\t\t";
 		else
 			cout << "4." << user_ptr->Name << "\t\t";
@@ -120,10 +140,12 @@ User* login_interface(SAConnection& conn)
 		cout << "\n\nDo you wanna publish your recipes? (y/n)... ";
 		cin >> t;
 
-		if (t == "y" || t == "Y")
+		if (t == "y" || t == "Y") {
 			return hc.Register(conn);
-		else
+		}
+		else {
 			return f.Register(conn);
+		}
 
 		break;
 
@@ -132,14 +154,17 @@ User* login_interface(SAConnection& conn)
 		cout << "\n\nAre you a HomeCook? (y/n)... ";
 		cin >> t;
 
-		if (t == "y" || t == "Y")
+		if (t == "y" || t == "Y") {
 			return hc.Login(conn);
-		else
+		}
+		else {
 			return f.Login(conn);
+		}
 
 		break;
 	}
 }
+
 
 void User::get_type()
 {

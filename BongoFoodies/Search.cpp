@@ -35,7 +35,7 @@ void byTitle(SAConnection& conn, string str)
 {
 	system("CLS");
 	string query = "SELECT Title FROM Recipes" + str;
-	vector<string> file_list = show_recipe(conn, query, "Title");
+	vector<string> file_list = show_recipe_list(conn, query, "Title");
 	cout << "\nEnter choice: ";
 	int ch;
 	cin >> ch;
@@ -51,7 +51,7 @@ void byRegion(SAConnection& conn)
 {
 	system("CLS");
 	string query = "SELECT DISTINCT Region FROM Recipes";
-	vector<string> file_list = show_recipe(conn, query, "Region");
+	vector<string> file_list = show_recipe_list(conn, query, "Region");
 	cout << "\nEnter choice: ";
 	int ch;
 	cin >> ch;
@@ -122,7 +122,7 @@ void byArea(SAConnection& conn)
 {
 	system("CLS");
 	string query = "SELECT DISTINCT Area FROM Delivery_area";
-	vector<string> file_list = show_recipe(conn, query, "Area");
+	vector<string> file_list = show_recipe_list(conn, query, "Area");
 	cout << "\nEnter choice: ";
 	int ch;
 	cin >> ch;

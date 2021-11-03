@@ -1,5 +1,5 @@
 #include "Foodie.h"
-extern bool logged_in;
+extern bool foodie_toggle;
 
 Foodie::Foodie() {
 	//cout << "fctor\n";
@@ -14,7 +14,7 @@ void Foodie::profile(SAConnection& conn)
 	cout << "User ID: " << UserID << endl;
 	cout << "Name: " << Name << endl;
 	cout << "Email: " << Email << endl;
-	cout << "Member since: " << DOR.tm_mday << "-" << DOR.tm_mon << "-" << DOR.tm_year << endl<<"\n\n";
+	cout << "Member since: " << DOR.tm_mday << "-" << DOR.tm_mon << "-" << DOR.tm_year+1900 << endl<<"\n\n";
 
 	cout << "1. View order history\n";
 	cout << "2. Logout\n";
@@ -29,7 +29,7 @@ void Foodie::profile(SAConnection& conn)
 		break;
 	case 2:
 		cout << "Logging Out\n\n";
-		logged_in = 0;
+		foodie_toggle = 0;
 		break;
 	default:
 		break;
@@ -40,13 +40,6 @@ Foodie* Foodie::Register(SAConnection& conn) {
 	system("CLS");
 	cout << "\n\t **** Registration ****\n\n";
 
-	SACommand Count(&conn);
-	Count.setCommandText(_TSA("SELECT UserID FROM Users"));
-	Count.Execute();
-	while(Count.FetchNext())
-	{
-		UserID = Count.Field(_TSA("UserID")).asUShort();
-	}
 	UserID++; 
 	time_t now = time(0);
 	struct tm* date = localtime(&now);
@@ -122,6 +115,7 @@ Foodie* Foodie::Login(SAConnection& conn)
 			Email = email;
 			Password = pass;
 			cout << "\nLogin successful!\n" << endl;
+			foodie_toggle = 1;
 			return this;
 		}
 	}
