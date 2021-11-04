@@ -276,7 +276,7 @@ void Recipe::recipe_options_interface(SAConnection& conn, int foodie_ID)
 		this->download_recipe(conn);
 		break;
 	case 3: {
-		this->order_recipe(conn);
+		this->order_recipe(conn, foodie_ID);
 		break; }
 	case 4:
 		this->show_cook_profile(conn);
@@ -286,15 +286,10 @@ void Recipe::recipe_options_interface(SAConnection& conn, int foodie_ID)
 	}
 }
 
-void Recipe::order_recipe(SAConnection& conn)
+void Recipe::order_recipe(SAConnection& conn, int foodie_ID)
 {
-	/*if (logged_in == 0)
-	{
-		MainMenu m;
-		m.login();
-	}*/
 	Order order;
-	order.order_details(conn, RecipeID, getPrice(), getRecipeTitle());
+	order.order_details(conn, foodie_ID, RecipeID,  getPrice(), getRecipeTitle());
 }
 
 double Recipe::getPrice()
@@ -407,7 +402,7 @@ void Recipe::edit_recipe(SAConnection& conn)
 				if (delivery_area.empty())
 					cout << "\nNo delivery areas found!";
 				else {
-					cout << "Enter new price ";
+					cout << "Enter new price: ";
 					cin >> price;
 					update.setCommandText(_TSA("UPDATE Recipes SET Price = :1 WHERE RecipeID = :2"));
 					update << (double)price << (unsigned short)RecipeID;

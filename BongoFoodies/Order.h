@@ -10,8 +10,6 @@
 #include <windows.h>
 #include <SQLAPI.h>
 #include<limits>
-#include<Recipe.h>
-#include<Foodie.h>
 
 using namespace std;
 
@@ -25,7 +23,7 @@ public:
     double calculate_amount(SAConnection& conn);
     void changeState(SAConnection& conn);
     void payment();
-    void order_details(SAConnection& conn, int i, double p, string rt);
+    void order_details(SAConnection& conn, int userid, int i, double p, string rt);
     void show_order(SAConnection& conn, string rt);
 
 protected:

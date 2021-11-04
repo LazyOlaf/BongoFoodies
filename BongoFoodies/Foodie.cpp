@@ -25,7 +25,7 @@ void Foodie::profile(SAConnection& conn)
 	switch (choice)
 	{
 	case 1:
-		this->order_history();
+		this->order_history(conn);
 		break;
 	case 2:
 		cout << "Logging Out\n\n";
@@ -123,5 +123,31 @@ Foodie* Foodie::Login(SAConnection& conn)
 	return Login(conn);
 }
 
-void Foodie::order_history() {
+void Foodie::order_history(SAConnection& conn) {
+	int orderId, quantity, foodId;
+	double amount;
+	string title;
+	string status;
+	SACommand find(&conn), find2(&conn);
+	find.setCommandText(_TSA("SELECT * FROM ORD WHERE CustomerID = :1"));
+	find << (unsigned short)UserID;
+	find.Execute();
+
+	while (find.FetchNext())
+	{
+		orderId = find.Field(_TSA("OrderID")).asUShort();
+		foodId = find.Field(_TSA("FoodID")).asUShort();
+		quantity = find.Field(_TSA("Quantity")).asUShort();
+		amount = find.Field(_TSA("Amount")).asDouble();
+		status = find.Field(_TSA("Status")).asString().GetMultiByteChars();
+
+		find2.setCommandText(_TSA("SELECT Title FROM Recipes WHERE RecipeID = :1"));
+		find2 << (unsigned short) foodId;
+		find2.Execute();
+		while (find2.FetchNext())
+		{
+			title = find2.Field(_TSA("Title")).asString().GetMultiByteChars();
+		}
+		cout << "\n\nOrder Id: " << orderId << "\nTitle: " << title << "\nQuantity: " << quantity << "\nAmount: " << amount << "\nStatus: " << status << "\n\n";
+	}
 }

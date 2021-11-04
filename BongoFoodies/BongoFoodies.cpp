@@ -62,6 +62,63 @@ int main()
 	);
 */
 /*
+	CREATE TABLE ORD
+	(
+		OrderID INT,
+		foodID INT,
+		customerID INT,
+		quantity INT,
+		amount NUMBER(4, 2),
+		status VARCHAR2(20),
+		CONSTRAINT o_fk1 FOREIGN KEY(foodID) references Recipes(RecipeID),
+		CONSTRAINT o_fk2 FOREIGN KEY(CustomerID) references Users(UserID)
+	);
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 	CREATE TABLE Orders
 	(
 		OrderID INT,

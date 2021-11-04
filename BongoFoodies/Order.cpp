@@ -40,7 +40,7 @@ double Order::calculate_amount(SAConnection& conn)
     return p;
 }
 
-void Order::order_details(SAConnection& conn, int i, double p, string rt)
+void Order::order_details(SAConnection& conn, int userid, int i, double p, string rt)
 {
     Sleep(100);
     system("CLS");
@@ -60,7 +60,7 @@ void Order::order_details(SAConnection& conn, int i, double p, string rt)
     //	struct tm* date = localtime(&now);
 
     food_id = i;
-    customer_id = User::UserID;
+    customer_id = userid;
     cout << "Enter quantity of your order: ";
     cin >> quantity;
     amount = p * quantity;
@@ -173,6 +173,7 @@ void Order::show_order(SAConnection& conn, string rt)
         default:
             break;
         }
+        system("pause");
     }
 
 }

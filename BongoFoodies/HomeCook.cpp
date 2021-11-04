@@ -139,7 +139,7 @@ void HomeCook::profile(SAConnection& conn)
 	}
 	break;
 	case 3: {
-		//this->orders_to_be_fulfilled();
+		this->orders_to_be_fulfilled(conn);
 	}
 		  break;
 	case 4:
@@ -154,5 +154,32 @@ void HomeCook::profile(SAConnection& conn)
 
 
 
+void HomeCook::orders_to_be_fulfilled(SAConnection& conn)
+{
+	int orderId, foodId, customerId, quantity;
+	string title;
+	string status = "In progress";
+	SACommand find(&conn), find2(&conn);
+	find.setCommandText(_TSA("SELECT * FROM ORD WHERE FoodID IN (SELECT RecipeID FROM Recipes WHERE CookID= :1) AND Status = :2"));
+	find << (unsigned short)UserID << status.c_str();
+	find.Execute();
 
+	while (find.FetchNext())
+	{
+		orderId = find.Field(_TSA("OrderID")).asUShort();
+		foodId = find.Field(_TSA("FoodID")).asUShort();
+		customerId = find.Field(_TSA("CustomerID")).asUShort();
+		quantity = find.Field(_TSA("Quantity")).asUShort();
+
+		find2.setCommandText(_TSA("SELECT Title FROM Recipes WHERE RecipeID = :1"));
+		find2 << (unsigned short)foodId;
+		find2.Execute();
+		while (find2.FetchNext())
+		{
+			title = find2.Field(_TSA("Title")).asString().GetMultiByteChars();
+		}
+
+		cout << "\n\nOrder Id: " << orderId << "\nCustomer Id: " << customerId << "\nTitle: " << title << "\nQuantity: " << quantity << "\n\n";
+	}
+}
 

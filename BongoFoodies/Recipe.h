@@ -42,7 +42,7 @@ public:
 	void download_recipe(SAConnection& conn);
 	void give_feedback(SAConnection& conn);
 	void show_cook_profile(SAConnection& conn);
-	void order_recipe(SAConnection& conn);
+	void order_recipe(SAConnection& conn, int foodie_ID);
 	//Recipe& operator=(const Recipe& r);
 	double getPrice();
 	string getRecipeTitle();

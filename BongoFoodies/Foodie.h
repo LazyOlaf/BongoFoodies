@@ -12,6 +12,6 @@ public:
 	void profile(SAConnection& conn);
 
 private:
-	void order_history();
+	void order_history(SAConnection& conn);
 };
 
