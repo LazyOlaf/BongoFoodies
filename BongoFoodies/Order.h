@@ -21,18 +21,12 @@ public:
 
     static int order_id;
     double calculate_amount(SAConnection& conn);
-    void changeState(SAConnection& conn);
-    void payment();
     void order_details(SAConnection& conn, int userid, int i, double p, string rt);
     void show_order(SAConnection& conn, string rt);
-
-protected:
-    struct tm DOR;
 
 private:
     int food_id;
     int customer_id;
-    string order_date;
     int quantity;
     double amount;
     string status;

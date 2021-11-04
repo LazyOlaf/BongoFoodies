@@ -11,7 +11,7 @@ using namespace std;
 
 class Mobile :public Payment
 {
-protected:
+private:
     string mobileNo,pin;
 public:
     string checkValidity(string mobileNo, string pin, double totalAmount);

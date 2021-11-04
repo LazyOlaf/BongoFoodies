@@ -230,9 +230,9 @@ void Recipe::show_recipe_details(SAConnection& conn, string filename)
 		cout << "\nProblem viewing!\n";
 	}
 
-	if (cook_toggle == 1)
+	if (cook_toggle > 0)
 		this->recipe_options_interface(conn);
-	else if (foodie_toggle == 1)
+	else if (foodie_toggle > 0)
 		this->recipe_options_interface(conn, User::UserID);
 
 	system("pause");
@@ -243,20 +243,36 @@ void Recipe::show_recipe_details(SAConnection& conn, string filename)
 void Recipe::recipe_options_interface(SAConnection& conn)
 {
 	cout << "\n\n\n";
-	cout << "1.Edit recipe\n" << "2.Download recipe\n" << "3.Back\n";
-	cout << "\nEnter choice: ";
-	int choice;
-	cin >> choice;
-	switch (choice)
-	{
-	case 1:
-		this->edit_recipe(conn);
-		break;
-	case 2:
-		this->download_recipe(conn);
-		break;
-	case 3:
-		break;
+	if (cook_toggle == cook_ID) {
+		cout << "1.Edit recipe\n" << "2.Download recipe\n" << "3.Back\n";
+		cout << "\nEnter choice: ";
+		int choice;
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:
+			this->edit_recipe(conn);
+			break;
+		case 2:
+			this->download_recipe(conn);
+			break;
+		case 3:
+			break;
+		}
+	}
+	else {
+		cout << "1.Download recipe\n" << "2.Back\n";
+		cout << "\nEnter choice: ";
+		int choice;
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:
+			this->download_recipe(conn);
+			break;
+		case 2:
+			break;
+		}
 	}
 }
 
@@ -289,18 +305,9 @@ void Recipe::recipe_options_interface(SAConnection& conn, int foodie_ID)
 void Recipe::order_recipe(SAConnection& conn, int foodie_ID)
 {
 	Order order;
-	order.order_details(conn, foodie_ID, RecipeID,  getPrice(), getRecipeTitle());
+	order.order_details(conn, foodie_ID, RecipeID, price, title);
 }
 
-double Recipe::getPrice()
-{
-	return price;
-}
-
-string Recipe::getRecipeTitle()
-{
-	return title;
-}
 
 void Recipe::edit_recipe(SAConnection& conn)
 {

@@ -17,7 +17,7 @@ using namespace std;
 
 class Recipe
 {
-protected:
+private:
 	string title;
 	int cook_ID;
 	string cook_name;
@@ -44,8 +44,6 @@ public:
 	void show_cook_profile(SAConnection& conn);
 	void order_recipe(SAConnection& conn, int foodie_ID);
 	//Recipe& operator=(const Recipe& r);
-	double getPrice();
-	string getRecipeTitle();
 
 	void upload_recipe(SAConnection& conn, int cook_ID);
 	void edit_recipe(SAConnection& conn);

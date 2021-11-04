@@ -115,7 +115,7 @@ Foodie* Foodie::Login(SAConnection& conn)
 			Email = email;
 			Password = pass;
 			cout << "\nLogin successful!\n" << endl;
-			foodie_toggle = 1;
+			foodie_toggle = UserID;
 			return this;
 		}
 	}

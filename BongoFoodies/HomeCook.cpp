@@ -89,7 +89,7 @@ HomeCook* HomeCook::Login(SAConnection& conn)
 			Email = email;
 			Password = pass;
 			cout << "\nLogin successful!\n" << endl;
-			cook_toggle = 1;
+			cook_toggle = UserID;
 			return this;
 		}
 	}

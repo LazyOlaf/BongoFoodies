@@ -15,10 +15,7 @@ using namespace std;
 
 class Payment
 {
-private:
-
 public:
-    int paid, totalAmount;
     virtual void checkPayment(double totalAmount, double paid)=0;
 };
 

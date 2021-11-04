@@ -95,7 +95,7 @@ void main_menu()
 		if (cook_toggle == 0 && foodie_toggle == 0)
 			cout << "4.Register/Login\t\t";
 		else
-			cout << "4." << user_ptr->Name << "\t\t";
+			cout << "4." << user_ptr->getUserName() << "\t\t";
 		cout << "5.Exit\n\n";
 
 		cout << "\nEnter choice: ";
